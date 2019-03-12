@@ -3,6 +3,10 @@ package profe.testing.httpunit.empleados;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import profe.empleados.model.Empleado;
+
 public class HttpUnitUtil {
 
 	public static InputStream getInputStreamFromString(String s) throws Exception {
@@ -17,5 +21,10 @@ public class HttpUnitUtil {
 		return getInputStreamFromString("{\"cif\":\"323452435B\",\"nombre\":\"Mirkka\",\"apellidos\":\"Touko\",\"edad\":22}");
 	}
 	
+	public static InputStream getEmpleadoAsInputStream(Empleado empleado) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(empleado);
+        return getInputStreamFromString(json);
+	}
 	
 }

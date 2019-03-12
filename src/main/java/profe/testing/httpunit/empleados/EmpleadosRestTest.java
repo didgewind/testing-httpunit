@@ -18,6 +18,8 @@ import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 
+import profe.empleados.model.Empleado;
+
 public class EmpleadosRestTest {
 
 	private WebConversation wc;
@@ -28,6 +30,8 @@ public class EmpleadosRestTest {
 	private interface Constantes {
 		String JSON_CONTENT_TYPE = "application/json";
 		int CONFLICT_STATUS_CODE = 409;
+		int OK_STATUS_CODE = 200;
+		int CREATED_STATUS_CODE = 201;
 	}
 	
 	@Before
@@ -39,14 +43,14 @@ public class EmpleadosRestTest {
 	public void whenGetEmpleadoNoExistenteStatusCodeNotFound() throws Exception {
 		exception.expect(HttpNotFoundException.class);
 		WebRequest request = new GetMethodWebRequest("http://localhost:5555/empleados/wert");
-		WebResponse response = wc.getResponse(request);
+		wc.getResponse(request);
 	}
 
 	@Test
 	public void whenDeleteEmpleadoNoExistenteStatusCodeNotFound() throws Exception {
 		exception.expect(HttpNotFoundException.class);
 		WebRequest request = new DeleteMethodWebRequest("http://localhost:5555/empleados/wert");
-		WebResponse response = wc.getResponse(request);
+		wc.getResponse(request);
 	}
 
 	@Test
@@ -56,7 +60,7 @@ public class EmpleadosRestTest {
 				HttpUnitUtil.getEmpleadoNoExistenteAsInputStream();
 		WebRequest request = new PutMethodWebRequest("http://localhost:5555/empleados/wert", is,
 				Constantes.JSON_CONTENT_TYPE);
-		WebResponse response = wc.getResponse(request);
+		wc.getResponse(request);
 	}
 
 	@Test
@@ -69,5 +73,21 @@ public class EmpleadosRestTest {
 		WebResponse response = wc.getResponse(request);
 		assertEquals(Constantes.CONFLICT_STATUS_CODE, response.getResponseCode());
 	}
+	
+	@Test
+	public void whenPostEmpleadoNuevoStatusCodeCreated() throws Exception {
+		wc.setExceptionsThrownOnErrorStatus(false);
+		InputStream is = 
+				HttpUnitUtil.getEmpleadoAsInputStream(
+						new Empleado("234", "Noelia", "Pérez", 22));
+		WebRequest request = new PostMethodWebRequest("http://localhost:5555/empleados/", is,
+				Constantes.JSON_CONTENT_TYPE);
+		WebResponse response = wc.getResponse(request);
+		assertEquals(Constantes.CREATED_STATUS_CODE, response.getResponseCode());
+		// Limpiamos
+		request = new DeleteMethodWebRequest("http://localhost:5555/empleados/234");
+		wc.getResponse(request);
+	}
+
 
 }
