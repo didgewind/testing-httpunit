@@ -1,0 +1,5 @@
+Proyecto que usa HttpUnit 1.7, y JUnit 4 (para integración con JMeter) para testear el
+servicio REST de empleados spring-boot (que tira de un dao mock). Este servicio se lanza
+directamente desde el jar.
+
+HttpUnitDemo muestra el funcionamiento básico de HttpUnit, EmpleadosRestTest tiene los tests
