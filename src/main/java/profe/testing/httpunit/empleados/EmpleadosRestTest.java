@@ -9,6 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meterware.httpunit.DeleteMethodWebRequest;
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.HttpNotFoundException;
@@ -19,6 +20,7 @@ import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 
 import profe.empleados.model.Empleado;
+import profe.empleados.model.EmpleadoForTest;
 
 public class EmpleadosRestTest {
 
@@ -28,6 +30,7 @@ public class EmpleadosRestTest {
 	public ExpectedException exception = ExpectedException.none();
 
 	private interface Constantes {
+		String restUrl = "http://localhost:5555/empleados/";
 		String JSON_CONTENT_TYPE = "application/json";
 		int CONFLICT_STATUS_CODE = 409;
 		int OK_STATUS_CODE = 200;
@@ -40,54 +43,84 @@ public class EmpleadosRestTest {
 	}
 
 	@Test
-	public void whenGetEmpleadoNoExistenteStatusCodeNotFound() throws Exception {
+	public void whenGetEmpleadoNoExistenteThenStatusCodeNotFound() throws Exception {
 		exception.expect(HttpNotFoundException.class);
-		WebRequest request = new GetMethodWebRequest("http://localhost:5555/empleados/wert");
+		WebRequest request = new GetMethodWebRequest(Constantes.restUrl + "wert");
 		wc.getResponse(request);
 	}
 
 	@Test
-	public void whenDeleteEmpleadoNoExistenteStatusCodeNotFound() throws Exception {
+	public void whenDeleteEmpleadoNoExistenteThenStatusCodeNotFound() throws Exception {
 		exception.expect(HttpNotFoundException.class);
-		WebRequest request = new DeleteMethodWebRequest("http://localhost:5555/empleados/wert");
+		WebRequest request = new DeleteMethodWebRequest(Constantes.restUrl + "wert");
 		wc.getResponse(request);
 	}
 
 	@Test
-	public void whenPutEmpleadoNoExistenteStatusCodeNotFound() throws Exception {
+	public void whenPutEmpleadoNoExistenteThenStatusCodeNotFound() throws Exception {
 		exception.expect(HttpNotFoundException.class);
 		InputStream is = 
 				HttpUnitUtil.getEmpleadoNoExistenteAsInputStream();
-		WebRequest request = new PutMethodWebRequest("http://localhost:5555/empleados/wert", is,
+		WebRequest request = new PutMethodWebRequest(Constantes.restUrl + "wert", is,
 				Constantes.JSON_CONTENT_TYPE);
 		wc.getResponse(request);
 	}
 
 	@Test
-	public void whenPostEmpleadoYaExistenteStatusCodeConflict() throws Exception {
+	public void whenPostEmpleadoYaExistenteThenStatusCodeConflict() throws Exception {
 		wc.setExceptionsThrownOnErrorStatus(false);
 		InputStream is = 
 				HttpUnitUtil.getEmpleadoYaExistenteAsInputStream();
-		WebRequest request = new PostMethodWebRequest("http://localhost:5555/empleados/", is,
+		WebRequest request = new PostMethodWebRequest(Constantes.restUrl + "", is,
 				Constantes.JSON_CONTENT_TYPE);
 		WebResponse response = wc.getResponse(request);
 		assertEquals(Constantes.CONFLICT_STATUS_CODE, response.getResponseCode());
 	}
 	
 	@Test
-	public void whenPostEmpleadoNuevoStatusCodeCreated() throws Exception {
-		wc.setExceptionsThrownOnErrorStatus(false);
+	public void whenPostEmpleadoThenNuevoStatusCodeCreated() throws Exception {
 		InputStream is = 
-				HttpUnitUtil.getEmpleadoAsInputStream(
-						new Empleado("234", "Noelia", "Pérez", 22));
-		WebRequest request = new PostMethodWebRequest("http://localhost:5555/empleados/", is,
+				HttpUnitUtil.getEmpleadoAsInputStream(getNuevoEmpleado());
+		WebRequest request = new PostMethodWebRequest(Constantes.restUrl, is,
 				Constantes.JSON_CONTENT_TYPE);
 		WebResponse response = wc.getResponse(request);
 		assertEquals(Constantes.CREATED_STATUS_CODE, response.getResponseCode());
 		// Limpiamos
-		request = new DeleteMethodWebRequest("http://localhost:5555/empleados/234");
+		request = new DeleteMethodWebRequest(Constantes.restUrl + "234");
 		wc.getResponse(request);
 	}
 
+	@Test
+	public void whenPostEmpleadoThenNuevoEmpleadoCreado() throws Exception {
+		EmpleadoForTest empExpected = getNuevoEmpleado();
+		InputStream is = 
+				HttpUnitUtil.getEmpleadoAsInputStream(empExpected);
+		WebRequest request = new PostMethodWebRequest(Constantes.restUrl, is,
+				Constantes.JSON_CONTENT_TYPE);
+		wc.getResponse(request);
+		request = new GetMethodWebRequest(Constantes.restUrl + empExpected.getCif());
+		WebResponse response = wc.getResponse(request);
+		ObjectMapper mapper = new ObjectMapper();
+		EmpleadoForTest empRecibido = mapper.readValue(response.getText(), EmpleadoForTest.class);
+		assertEquals(empExpected, empRecibido);
+		System.out.println(empRecibido);
+		// Limpiamos
+		request = new DeleteMethodWebRequest(Constantes.restUrl + "234");
+		wc.getResponse(request);
+	}
+
+	@Test
+	public void whenGetAllEmpleadosThenReceivedLengthIs6() throws Exception {
+		WebRequest request = new GetMethodWebRequest(Constantes.restUrl);
+		WebResponse response = wc.getResponse(request);
+		ObjectMapper mapper = new ObjectMapper();
+		Empleado[] empleados = mapper.readValue(response.getText(), Empleado[].class);
+		assertEquals(6, empleados.length);
+	}
+
+	private static EmpleadoForTest getNuevoEmpleado() {
+		return new EmpleadoForTest("234", "Noelia", "Pérez", 22);
+	}
+	
 
 }
