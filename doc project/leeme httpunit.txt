@@ -1,11 +1,21 @@
-Proyecto que usa HttpUnit 1.7, y JUnit 4 (para integración con JMeter) para testear el
+Proyecto que usa HttpUnit 1.7, JUnit 5 y JUnit 4(para integración con JMeter) para testear el
 servicio REST de empleados spring-boot (que tira de un dao mock). Este servicio se lanza
 directamente desde el jar.
 
-HttpUnitDemo muestra el funcionamiento básico de HttpUnit, EmpleadosRestTest tiene los tests.
+HttpUnitDemo muestra el funcionamiento básico de HttpUnit, EmpleadosRestTest tiene los tests
+del servicio REST (escritos con JUnit5), EmpleadosRestPerformanceTest los tests de rendimiento
+(escritos en JUnit 4 para integrarlo con JMeter).
 
 Los tests de códigos de estado para métodos cuando hay un error de petición
 se basan en excepciones que lanza HttpUnit
 para las respuestas NOT_FOUND (get one, delete y put de empleado no existente) y en comparar
 el código de estado con CONFLICT para post de empleado ya existente (antes hay que invocar
 wc.setExceptionsThrownOnErrorStatus(false);)
+
+Los primeros commits trabajaban sólo con JUnit 4.
+
+Hay dos plugins añadidos al pom.xml. Uno es para copiar todas las dependencias a la carpeta
+target/lib y poder copiarlas manualmente a $JMETER_HOME/lib/testing, la otra para copiar el 
+jar resultante a la carpeta $JMETER_HOME/lib/junit. El
+primero se lanza en la fase prepare_package, el segundo en la fase install. Hemos asignado
+Ctrl + Alt + m para ejecutar maven install y que se hagan las dos cosas.

@@ -1,13 +1,12 @@
 package profe.testing.httpunit.empleados;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.InputStream;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meterware.httpunit.DeleteMethodWebRequest;
@@ -26,9 +25,6 @@ public class EmpleadosRestTest {
 
 	private WebConversation wc;
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
-
 	private interface Constantes {
 		String restUrl = "http://localhost:5555/empleados/";
 		String JSON_CONTENT_TYPE = "application/json";
@@ -37,33 +33,30 @@ public class EmpleadosRestTest {
 		int CREATED_STATUS_CODE = 201;
 	}
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		wc = new WebConversation();
 	}
 
 	@Test
 	public void whenGetEmpleadoNoExistenteThenStatusCodeNotFound() throws Exception {
-		exception.expect(HttpNotFoundException.class);
 		WebRequest request = new GetMethodWebRequest(Constantes.restUrl + "wert");
-		wc.getResponse(request);
+		assertThrows(HttpNotFoundException.class, () -> wc.getResponse(request));
 	}
 
 	@Test
 	public void whenDeleteEmpleadoNoExistenteThenStatusCodeNotFound() throws Exception {
-		exception.expect(HttpNotFoundException.class);
 		WebRequest request = new DeleteMethodWebRequest(Constantes.restUrl + "wert");
-		wc.getResponse(request);
+		assertThrows(HttpNotFoundException.class, () -> wc.getResponse(request));
 	}
 
 	@Test
 	public void whenPutEmpleadoNoExistenteThenStatusCodeNotFound() throws Exception {
-		exception.expect(HttpNotFoundException.class);
 		InputStream is = 
 				HttpUnitUtil.getEmpleadoNoExistenteAsInputStream();
 		WebRequest request = new PutMethodWebRequest(Constantes.restUrl + "wert", is,
 				Constantes.JSON_CONTENT_TYPE);
-		wc.getResponse(request);
+		assertThrows(HttpNotFoundException.class, () -> wc.getResponse(request));
 	}
 
 	@Test
