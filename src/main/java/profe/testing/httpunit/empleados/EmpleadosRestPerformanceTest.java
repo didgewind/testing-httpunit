@@ -26,13 +26,10 @@ import profe.empleados.model.EmpleadoForTest;
 public class EmpleadosRestPerformanceTest {
 
 	private WebConversation wc;
-	private static int intCif = 0;
 
 	private interface Constantes {
 		String restUrl = "http://localhost:5555/empleados/";
 		String JSON_CONTENT_TYPE = "application/json";
-		int CONFLICT_STATUS_CODE = 409;
-		int OK_STATUS_CODE = 200;
 		int CREATED_STATUS_CODE = 201;
 	}
 	
@@ -51,12 +48,12 @@ public class EmpleadosRestPerformanceTest {
 		assertEquals(Constantes.CREATED_STATUS_CODE, response.getResponseCode());
 	}
 	
-	private synchronized static int getNextCif() {
-		return ++intCif;
+	private int getNewCif() {
+		return (int) (Math.random() * 100000000);
 	}
 
-	private static EmpleadoForTest getNuevoEmpleado() {
-		return new EmpleadoForTest("" + getNextCif(), "Noelia", "Pérez", 22);
+	private EmpleadoForTest getNuevoEmpleado() {
+		return new EmpleadoForTest("" + getNewCif(), "Noelia", "Pérez", 22);
 	}
 	
 }
