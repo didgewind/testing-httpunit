@@ -54,8 +54,12 @@ public class EmpleadosRestPerformanceTest {
 	}
 
 	private EmpleadoForTest getNuevoEmpleado() {
-//		return new EmpleadoForTest("" + getNewCif(), "Noelia", "Pérez", 22);
-		return new EmpleadoForTest(getCifFromJMeter(), "Noelia", "Pérez", 22);
+		JUnitSampler sampler = new JUnitSampler();
+		String cif = sampler.getThreadContext().getVariables().get("cif");
+		String nombre = sampler.getThreadContext().getVariables().get("nombre");
+		String apellidos = sampler.getThreadContext().getVariables().get("apellidos");
+		int edad = Integer.parseInt(sampler.getThreadContext().getVariables().get("edad"));
+		return new EmpleadoForTest(cif, nombre, apellidos, edad);
 	}
 	
 	private String getCifFromJMeter() {
