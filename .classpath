@@ -35,5 +35,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="/home/made/applications/apache-jmeter-5.1/lib/ext/ApacheJMeter_core.jar"/>
+	<classpathentry kind="lib" path="/home/made/applications/apache-jmeter-5.1/lib/ext/ApacheJMeter_junit.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

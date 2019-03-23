@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 
+import org.apache.jmeter.protocol.java.sampler.JUnitSampler;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,7 +54,13 @@ public class EmpleadosRestPerformanceTest {
 	}
 
 	private EmpleadoForTest getNuevoEmpleado() {
-		return new EmpleadoForTest("" + getNewCif(), "Noelia", "Pérez", 22);
+//		return new EmpleadoForTest("" + getNewCif(), "Noelia", "Pérez", 22);
+		return new EmpleadoForTest(getCifFromJMeter(), "Noelia", "Pérez", 22);
+	}
+	
+	private String getCifFromJMeter() {
+		JUnitSampler sampler = new JUnitSampler();
+		return sampler.getThreadContext().getVariables().get("cif");
 	}
 	
 }
